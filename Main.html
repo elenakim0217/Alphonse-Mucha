@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphonse Mucha</title>
+    <style>
+        /* 기본 스타일 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* 스크롤 방지 */
+            transition: background-color 0.5s ease; /* 배경색 전환 효과 */
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #bb3a27;
+            padding-top: 60px; /* Header 높이만큼 공간 확보 */
+            padding-bottom: 140px; /* Footer 높이만큼 공간 확보 */
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            gap: 25px;
+            color: white;
+            font-family: sans-serif;
+            font-weight: bold;
+            z-index: 50;
+            box-sizing: border-box;
+        }
+
+        header span {
+            cursor: pointer;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 50;
+        }
+
+        #start-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            cursor: pointer;
+            color: white;
+            font-size: 2em;
+            font-family: sans-serif;
+            transition: opacity 0.5s ease;
+            text-align: center;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none; /* 기본적으로 숨김 */
+            justify-content: center;
+            align-items: center;
+            z-index: 110;
+        }
+
+        .modal-content {
+            position: relative;
+            padding: 30px;
+            padding-top: 50px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            max-width: 600px;
+            width: 80%;
+            color: white;
+            font-family: sans-serif;
+            line-height: 1.6;
+        }
+
+        .close-modal-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2em;
+            cursor: pointer;
+            color: white;
+        }
+
+        #container {
+            display: grid; /* CSS Grid 레이아웃 사용 */
+            grid-auto-flow: dense; /* 빈 공간을 채우는 알고리즘 */
+            gap: 10px; /* 박스 사이의 간격 */
+            width: 100%;
+            height: 100%;
+            transition: all 1s ease; /* 그리드 변경 시 부드러운 효과 */
+            box-sizing: border-box;
+        }
+
+        .item {
+            text-align: left; /* 모든 텍스트 왼쪽 정렬 */
+            transition: all 1s ease; /* 부드러운 전환 효과 */
+            font-weight: bold;
+            display: flex; /* 텍스트를 정렬하기 위함 */
+            align-items: flex-start; /* 텍스트를 상단에 정렬 */
+            box-sizing: border-box; /* 패딩이 크기에 영향을 주지 않도록 설정 */
+            line-height: 1.1; /* 줄 간격 축소 */
+            word-break: break-word; /* 단어가 박스를 넘어갈 경우 줄바꿈 */
+        }
+
+        .item span {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #slider-container {
+            position: static;
+            transform: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* 슬라이더 사이 간격 조정 */
+            width: 80%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-wrapper label {
+            color: white;
+            font-family: sans-serif;
+            font-size: 0.9em;
+            width: 50px;
+            text-align: left;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 3px;
+            background: white;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+
+        /* 992px 이하 화면 */
+        @media screen and (max-width: 992px) {
+            body { background-color: #b8c7ab; }
+            .item, header { color: black; }
+            .slider-wrapper label { color: black; }
+            .slider { background: black; }
+            .slider::-webkit-slider-thumb { background: black; }
+            .slider::-moz-range-thumb { background: black; }
+            .modal-content { background-color: rgba(255, 255, 255, 0.7); color: black; }
+            .close-modal-button { color: black; }
+        }
+
+        /* 600px 이하 화면 */
+        @media screen and (max-width: 600px) {
+            body { background-color: #537f68; }
+            .item, header { color: white; }
+            .slider-wrapper label { color: white; }
+            .slider { background: white; }
+            .slider::-webkit-slider-thumb { background: white; }
+            .slider::-moz-range-thumb { background: white; }
+            .modal-content { background-color: rgba(0, 0, 0, 0.5); color: white; }
+            .close-modal-button { color: white; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span id="info-button">☻</span>
+        <span id="exhibition-button">전시</span>
+        <span>정보</span>
+        <span id="external-link">그 외</span>
+    </header>
+
+    <div id="start-overlay">
+        <p>Welcome to Alphonse Mucha Exhibition! <br> Click here!</p>
+    </div>
+
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-info-modal" class="close-modal-button">×</span>
+            <p><b>Structured</b><br>
+사람들은 주로  전시를 관람하기 위해서 사전에 디지털 또는 인쇄 매체를 통해 정보를 확인한 다음 전시장에 방문한다. 다만 전시에 대한 정보는 매체에 따라 제각각이라 파악하기에 가끔 헷갈릴 때가 많다. 전시 정보의 이미지를 최대한 배제한 채 오직 텍스트 정보만 활용해 직관적으로 정보를 파악할 수 있게끔 만들었다. 뿐만 아니라, 관람자가 다양한 색깔 또는 폰트를 조절해 정보를 파악하기 더 편하도록 관람자의 시선으로 조절하게끔 설계했다.</p>
+        </div>
+    </div>
+    
+    <div id="exhibition-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-exhibition-modal" class="close-modal-button">×</span>
+            <p><b>아르누보 미술의 거장, 알폰스 무하 탄생</b><br>
+165주년을 기념하여 &lt;&lt;아르누보의 꽃: 알폰스 무하 원화전&gt;&gt;을
+2025년 3월 20일부터 2025년 7월 13일까지 개최하여, 무하의 독창적이고 상징적인 예술 세계를 직접 감상할 수 있는 기회를 제공한다. 아르누보는 특정 시스템이나 원칙을 따르지 않는 독특한 예술 운동이었다. 19세기 말 유럽에서 정치적, 사회적, 기술적 변화가 급격히 이루어지면서, 사람들은 낡은 질서를 벗어나 새로운 현실을 수용할 필요성을 느꼈다. <br> 이러한 시대적 요구 속에서 탄생한 아르누보는 회화, 조각, 그래픽 아트, 건축, 장식 예술 등 시각 예술 전반에 걸쳐 큰 영향을 미쳤다. 무하의 독창적인 스타일, 이른바 "르 스타일 무하 (Le Style Mucha)"는 슬라브 민족적 모티프와 결합하며 아르누보 운동의 대표적인 아이콘으로 자리 잡았다. 이번 전시는 무하가 프랑스에서 얻은 성공과 명성을 넘어, 그의 예술과 철학이 체코 민족 정체성으로 확장되는 과정을 조명한다. 그의 오리지널 포스터, 판화, 드로잉, 유화, 도서 간행물, 디자인 장식 오브제 등 300여 점의 작품을 통해 예술적 여정을 살펴보자.</p>
+        </div>
+    </div>
+
+
+    <div id="container">
+        <!-- 8개의 item 박스를 생성하고 내용을 넣습니다 -->
+        <div class="item"><span>알폰스 무하 원화전</span></div>
+        <div class="item"><span>2025.03.20-2025.07.13.</span></div>
+        <div class="item"><span>마이아트뮤지엄</span></div>
+        <div class="item"><span>월-일 10:00-19:40 (입장마감 19:00)</span></div>
+        <div class="item"><span>정규도슨트 월-금 11:00, 14:00, 16:00</span></div>
+        <div class="item"><span>The Flower of Art Nouveau: Original Artworks of Alphonse Mucha</span></div>
+        <div class="item"><span>서울특별시 강남구 테헤란로 518 섬유센터빌딩 B1층</span></div>
+        <div class="item"><span>Alphonse Mucha</span></div>
+    </div>
+    
+    <footer>
+        <div id="slider-container">
+            <div class="slider-wrapper">
+                <label for="color-slider">Colors</label>
+                <input type="range" min="0" max="100" value="50" class="slider" id="color-slider">
+            </div>
+            <div class="slider-wrapper">
+                <label for="font-slider">Fonts</label>
+                <input type="range" min="0" max="100" value="50" class="slider" id="font-slider">
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const container = document.getElementById('container');
+        const items = document.querySelectorAll('.item');
+        const startOverlay = document.getElementById('start-overlay');
+        const colorSlider = document.getElementById('color-slider');
+        const fontSlider = document.getElementById('font-slider');
+        
+        const infoButton = document.getElementById('info-button');
+        const infoModal = document.getElementById('info-modal');
+        const closeInfoModal = document.getElementById('close-info-modal');
+
+        const exhibitionButton = document.getElementById('exhibition-button');
+        const exhibitionModal = document.getElementById('exhibition-modal');
+        const closeExhibitionModal = document.getElementById('close-exhibition-modal');
+        
+        const externalLink = document.getElementById('external-link');
+
+        let resizeTimer;
+        let audioCtx; 
+
+        // 사용 가능한 폰트 및 색상 배열
+        const fonts = ["'Times New Roman', Times, serif", "Arial, Helvetica, sans-serif", "'Courier New', Courier, monospace", "Georgia, serif", "Verdana, sans-serif"];
+        const lightBgColors = ['#000000', '#556B2F', '#2F4F4F', '#8B4513', '#4682B4', '#800000'];
+        const darkBgColors = ['#FFFFFF', '#F0E68C', '#ADD8E6', '#FFB6C1', '#E6E6FA', '#F5DEB3'];
+
+        items.forEach(item => {
+            const span = item.querySelector('span');
+            span.dataset.originalText = span.textContent;
+        });
+
+        function addRandomBreaks(span) {
+            const originalText = span.dataset.originalText;
+            const words = originalText.split(' ');
+            let newHtml = '';
+            words.forEach((word, index) => {
+                newHtml += word + ' ';
+                if (index < words.length - 1 && Math.random() > 0.7) {
+                    newHtml += '<br>';
+                }
+            });
+            span.innerHTML = newHtml.trim();
+        }
+        
+        function fitTextToBox(item) {
+            const span = item.querySelector('span');
+            let fontSize = 100;
+            span.style.fontSize = fontSize + 'px';
+
+            while ((span.scrollHeight > item.clientHeight || span.scrollWidth > item.clientWidth) && fontSize > 5) {
+                fontSize--;
+                span.style.fontSize = fontSize + 'px';
+            }
+        }
+
+        function typeText(span) {
+            if (span.typingInterval) {
+                clearInterval(span.typingInterval);
+            }
+            
+            const finalHtml = span.innerHTML;
+            span.innerHTML = ''; 
+
+            let i = 0;
+            span.typingInterval = setInterval(() => {
+                if (i < finalHtml.length) {
+                    if (finalHtml[i] === '<') {
+                        const tagEndIndex = finalHtml.indexOf('>', i);
+                        span.innerHTML += finalHtml.substring(i, tagEndIndex + 1);
+                        i = tagEndIndex;
+                    } else {
+                        span.innerHTML += finalHtml[i];
+                    }
+                    i++;
+                } else {
+                    clearInterval(span.typingInterval);
+                    span.typingInterval = null;
+                }
+            }, 25);
+        }
+
+        function playSound() {
+            if (!audioCtx) return; 
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); 
+
+            gainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        }
+        
+        // 슬라이더 변경 시 폰트/색상 업데이트 함수
+        function handleStyleChange() {
+             const bodyStyle = window.getComputedStyle(document.body);
+            const bodyBgColor = bodyStyle.backgroundColor;
+            // 현재 배경색에 따라 사용할 색상 배열 결정
+            const currentColors = (bodyBgColor === 'rgb(184, 199, 171)') ? lightBgColors : darkBgColors;
+
+            const colorIndex = Math.floor((colorSlider.value / 100) * (currentColors.length -1));
+            const fontIndex = Math.floor((fontSlider.value / 100) * (fonts.length-1));
+
+            const newColor = currentColors[colorIndex];
+            const newFont = fonts[fontIndex];
+
+            items.forEach(item => {
+                const span = item.querySelector('span');
+                span.style.color = newColor;
+                span.style.fontFamily = newFont;
+            });
+        }
+
+
+        function randomizeLayout() {
+            playSound(); 
+
+            let numColumns, numRows;
+
+            if (window.innerWidth <= 600) {
+                numColumns = 2; 
+                numRows = 4;
+            } else if (window.innerWidth <= 992) {
+                numColumns = 3; 
+                numRows = 3;
+            } else {
+                numColumns = 4; 
+                numRows = 3;
+            }
+
+            container.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
+            container.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;
+
+            items.forEach(item => {
+                item.style.gridColumn = 'auto';
+                item.style.gridRow = 'auto';
+            });
+            
+            const shuffledItems = Array.from(items).sort(() => Math.random() - 0.5);
+            let usedIndexes = [];
+
+            if (numColumns > 1 && numRows > 1 && shuffledItems.length > 0) {
+                shuffledItems[0].style.gridColumn = 'span 2';
+                shuffledItems[0].style.gridRow = 'span 2';
+                usedIndexes.push(0);
+            }
+
+            const wideItemIndex = shuffledItems.findIndex((_, index) => !usedIndexes.includes(index));
+            if (numColumns > 1 && wideItemIndex !== -1) {
+                shuffledItems[wideItemIndex].style.gridColumn = 'span 2';
+                usedIndexes.push(wideItemIndex);
+            }
+
+            const tallItemIndex = shuffledItems.findIndex((_, index) => !usedIndexes.includes(index));
+             if (numRows > 1 && tallItemIndex !== -1) {
+                shuffledItems[tallItemIndex].style.gridRow = 'span 2';
+                usedIndexes.push(tallItemIndex);
+            }
+
+            setTimeout(() => {
+                items.forEach(item => {
+                    const span = item.querySelector('span');
+                    addRandomBreaks(span); 
+                    fitTextToBox(item);    
+                    typeText(span);        
+                });
+                handleStyleChange(); // 레이아웃 변경 시 슬라이더 값에 맞는 스타일 적용
+            }, 100); 
+        }
+        
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(randomizeLayout, 200);
+        });
+        
+        colorSlider.addEventListener('input', handleStyleChange);
+        fontSlider.addEventListener('input', handleStyleChange);
+
+        startOverlay.addEventListener('click', () => {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.error("Web Audio API is not supported in this browser");
+            }
+            
+            startOverlay.style.opacity = '0';
+            setTimeout(() => {
+                startOverlay.style.display = 'none';
+            }, 500);
+
+            randomizeLayout();
+        }, { once: true });
+
+        // 정보 모달 창 이벤트 리스너
+        infoButton.addEventListener('click', () => {
+            infoModal.style.display = 'flex';
+        });
+
+        closeInfoModal.addEventListener('click', () => {
+            infoModal.style.display = 'none';
+        });
+
+        infoModal.addEventListener('click', (event) => {
+            if (event.target === infoModal) {
+                infoModal.style.display = 'none';
+            }
+        });
+
+        // 전시 모달 창 이벤트 리스너
+        exhibitionButton.addEventListener('click', () => {
+            exhibitionModal.style.display = 'flex';
+        });
+
+        closeExhibitionModal.addEventListener('click', () => {
+            exhibitionModal.style.display = 'none';
+        });
+
+        exhibitionModal.addEventListener('click', (event) => {
+            if (event.target === exhibitionModal) {
+                exhibitionModal.style.display = 'none';
+            }
+        });
+        
+        // "그 외" 링크 이벤트 리스너
+        externalLink.addEventListener('click', () => {
+            window.open('http://www.myartmuseum.co.kr/exhibit/exhibit_past.php?ptype=view&prdcode=2502040001&page=1&catcode=12000000', '_blank');
+        });
+
+    </script>
+
+</body>
+</html>
+
